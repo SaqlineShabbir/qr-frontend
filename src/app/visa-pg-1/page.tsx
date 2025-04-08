@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 
 import { QRCodeCanvas } from "qrcode.react";
@@ -39,7 +39,7 @@ const VisaForm1 = () => {
   const router = useRouter();
 
   console.log("API_URL:", API_URL);
-  
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [formData, setFormData] = useState<FormData>(initialFormData);
   const [activeTab, setActiveTab] = useState(0);
   const [errors, setErrors] = useState<Errors>({});
@@ -50,13 +50,23 @@ const VisaForm1 = () => {
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-    setFormData({ ...formData, [name]: value });
+    const updatedForm = { ...formData, [name]: value };
+    setFormData(updatedForm);
+    localStorage.setItem("visaFormDataOne", JSON.stringify(updatedForm));
+    // setFormData({ ...formData, [name]: value });
   };
+  useEffect(() => {
+    const savedForm = localStorage.getItem("visaFormDataOne");
+    if (savedForm) {
+      setFormData(JSON.parse(savedForm));
+    }
+  }, []);
 
   const handleReset = () => {
     setFormData(initialFormData);
     setErrors({});
     localStorage.removeItem("visaFormData");
+    localStorage.removeItem("visaFormDataOne");
   };
 
   const validateForm = (): Errors => {
@@ -76,17 +86,17 @@ const VisaForm1 = () => {
 
   const handleNext = async () => {
     const validationErrors = validateForm();
-    if (Object.keys(validationErrors).length === 0 && activeTab < tabLabels.length - 1) {
-      setActiveTab(activeTab + 1);
-    }
+    // if (Object.keys(validationErrors).length === 0 && activeTab < tabLabels.length - 1) {
+    //   setActiveTab(activeTab + 1);
+    // }
     setErrors(validationErrors);
     if (Object.keys(validationErrors).length > 0) return;
 
   //  Proceed if all fields are valid
-  if (activeTab < tabLabels.length - 1) {
-    setActiveTab(activeTab + 1);
-  }
-
+  // if (activeTab < tabLabels.length - 1) {
+  //   setActiveTab(activeTab + 1);
+  // }
+  setIsSubmitting(true);
     try {
       const personalDetailsJson = {
         personalDetails: {
@@ -106,6 +116,8 @@ const VisaForm1 = () => {
     } catch (error) {
       console.error("Error saving data to MongoDB:", error);
       alert("Error saving data. Please try again.");
+    }finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -189,7 +201,7 @@ const VisaForm1 = () => {
                     name="dateOfBirth"
                     value={formData.dateOfBirth}
                     onChange={handleChange}
-                    className="p-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                    className="p-3 rounded-lg border w-full border-gray-300 focus:ring-2 focus:ring-green-500 focus:border-transparent"
                   />
                   {errors.dateOfBirth && <span className="text-red-500 text-sm mt-1">{errors.dateOfBirth}</span>}
                 </div>
@@ -292,9 +304,14 @@ const VisaForm1 = () => {
                     <button
                       type="button"
                       onClick={handleNext}
-                      className="px-6 py-3 bg-green-600 hover:bg-green-700 text-white rounded-lg transition-colors flex-1 min-w-[120px]"
+                      disabled={isSubmitting}
+                      className={`px-6 py-3 rounded-lg transition-colors flex-1 min-w-[120px] ${
+                        isSubmitting
+                          ? "bg-green-400 cursor-not-allowed"
+                          : "bg-green-600 hover:bg-green-700 text-white"
+                      }`}
                     >
-                      Next
+                      {isSubmitting ? "Processing..." : "Next"}
                     </button>
                     <button
                       type="button"
@@ -318,19 +335,19 @@ const VisaForm1 = () => {
               </form>
             )}
             
-            {activeTab === 1 && (
+            {/* {activeTab === 1 && (
               <div className="py-12 text-center">
                 <h3 className="text-xl font-semibold text-gray-700">Passport Details - Under Construction</h3>
                 <p className="mt-2 text-gray-600">This section is currently being developed</p>
               </div>
-            )}
+            )} */}
             
-            {activeTab === 2 && (
+            {/* {activeTab === 2 && (
               <div className="py-12 text-center">
                 <h3 className="text-xl font-semibold text-gray-700">Review Section - Under Construction</h3>
                 <p className="mt-2 text-gray-600">This section is currently being developed</p>
               </div>
-            )}
+            )} */}
           </div>
         </div>
       </div>
