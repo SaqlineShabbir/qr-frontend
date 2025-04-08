@@ -43,16 +43,40 @@ const VisaForm2 = () => {
   const tabLabels = ["Personal Details", "Passport Details", "Contact Details", "Visa Details"];
 
   useEffect(() => {
-    const savedFormData = localStorage.getItem("visaFormData");
-    if (savedFormData) {
-      try {
-        setFormData(JSON.parse(savedFormData));
-      } catch (error) {
-        console.error("Error parsing visaFormData from localStorage:", error);
+    const visaId = Array.isArray(id) ? id[0] : id;
+  
+    if (visaId) {
+      axios.get(`${API_URL}/api/visa/${visaId}`)
+        .then(res => {
+          const data = res.data?.passportDetails;
+          if (data) {
+            const updatedForm: FormData = {
+              passportnumber: data.passportNumber || "",
+              placeofIssue: data.placeofIssue || "",
+              dateOfIssue: data.dateOfIssue?.substring(0, 10) || "",
+              dateOfExpiry: data.dateOfExpiry?.substring(0, 10) || "",
+            };
+            setFormData(updatedForm);
+            localStorage.setItem("visaFormData", JSON.stringify(updatedForm));
+            localStorage.setItem("visaId", visaId);
+          }
+        })
+        .catch(err => {
+          console.error("Failed to fetch visa details:", err);
+        });
+    } else {
+      const savedFormData = localStorage.getItem("visaFormData");
+      if (savedFormData) {
+        try {
+          setFormData(JSON.parse(savedFormData));
+        } catch (error) {
+          console.error("Error parsing visaFormData from localStorage:", error);
+        }
       }
     }
   }, []);
-
+  
+  
   useEffect(() => {
     localStorage.setItem("visaFormData", JSON.stringify(formData));
   }, [formData]);
@@ -96,9 +120,9 @@ const VisaForm2 = () => {
       const passportDetailsJson = {
         passportDetails: {
           passportNumber: formData.passportnumber,
-          issueDate: formData.dateOfIssue,
-          expiryDate: formData.dateOfExpiry,
-          issuingCountry: formData.placeofIssue,
+          dateOfIssue: formData.dateOfIssue,
+          dateOfExpiry: formData.dateOfExpiry,
+          placeofIssue: formData.placeofIssue, 
         },
       };
 
@@ -247,7 +271,7 @@ const VisaForm2 = () => {
                 <div className="flex flex-col md:col-span-2 gap-4 mt-4">
                   <div className="flex flex-wrap justify-between gap-4">
                     <Link 
-                      href={`/visa-pg-1`}
+                      href={`/visa-pg-1/${id}`}
                       className="px-6 py-3 bg-gray-200 hover:bg-gray-300 text-gray-800 rounded-lg transition-colors flex-1 min-w-[120px] text-center"
                     >
                       Back

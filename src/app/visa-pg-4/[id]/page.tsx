@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { QRCodeCanvas } from "qrcode.react";
 import axios from "axios";
 import Link from "next/link";
@@ -128,6 +128,31 @@ const VisaForm4 = () => {
     setShowQRCode(!showQRCode);
   };
 
+
+  useEffect(() => {
+    const visaId = Array.isArray(id) ? id[0] : id;
+  
+    if (visaId) {
+      axios.get(`${API_URL}/api/visa/${visaId}`)
+        .then(res => {
+          const data = res.data?.visaDetails;
+          if (data) {
+            const updatedForm: FormData = {
+              visaType: data.visaType || "",
+              purposeofJourney: data.purposeofJourney || "",
+              noofEntry: data.noofEntry || "",
+              expentryDate: data.expentryDate?.substring(0, 10) || "",
+              noofTravelDoc: data.noofTravelDoc?.toString() || "",
+            };
+            setFormData(updatedForm);
+          }
+        })
+        .catch(err => {
+          console.error("Failed to fetch visa details:", err);
+        });
+    }
+  }, []);
+  
   return (
     <>
       <Head>

@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { QRCodeCanvas } from "qrcode.react";
 import axios from "axios";
 import Link from "next/link";
@@ -118,6 +118,32 @@ const VisaForm3 = () => {
   const handleQRCodeDisplay = () => {
     setShowQRCode(!showQRCode);
   };
+
+  
+useEffect(() => {
+  const visaId = Array.isArray(id) ? id[0] : id;
+
+  if (visaId) {
+    axios.get(`${API_URL}/api/visa/${visaId}`)
+      .then(res => {
+        const data = res.data?.contactDetails;
+        if (data) {
+          const updatedForm: FormData = {
+            presentAddress: data.presentAddress || "",
+            permanent: data.permanent || "",
+            phone: data.phone || "",
+            email: data.email || "",
+            currentOccupation: data.currentOccupation || "",
+            employerName: data.employerName || "",
+          };
+          setFormData(updatedForm);
+        }
+      })
+      .catch(err => {
+        console.error("Failed to fetch contact details:", err);
+      });
+  }
+}, []);
 
   return (
     <>
