@@ -21,9 +21,11 @@
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",
+    "@types/country-data": "^0.0.5",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "@types/react-world-flags": "^1.6.0",
     "tailwindcss": "^4",
     "typescript": "^5"
   }
