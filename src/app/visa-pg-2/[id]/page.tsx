@@ -363,7 +363,8 @@ const VisaForm2 = () => {
                     type="file"
                     accept=".pdf,.jpg,.jpeg,.png"
                     onChange={handleFileChange}
-                    className="p-3 border rounded-lg"
+                    className={`p-3 rounded-lg border focus:ring-2 focus:ring-green-500 focus:border-transparent  border-gray-300
+                    }`}
                   />
                 </div>
 

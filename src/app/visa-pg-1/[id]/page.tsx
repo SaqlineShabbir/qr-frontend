@@ -5,7 +5,10 @@ import Link from "next/link";
 import { QRCodeCanvas } from "qrcode.react";
 import axios from "axios";
 import { useRouter, useParams } from "next/navigation";
-
+import AutocompleteField from "@/components/autoCompleteField";
+import { countries } from "country-data";
+import Flag from "react-world-flags";
+import toast, { Toaster } from "react-hot-toast";
 type FormData = {
   firstName: string;
   lastName: string;
@@ -38,14 +41,30 @@ const VisaForm1 = () => {
   const FRONTEND_URL = process.env.NEXT_PUBLIC_FRONTEND_URL;
   const router = useRouter();
 
+  const countryOptions = countries.all.map((country: any) => ({
+    value: country.alpha2,
+    label: country.name,
+    flag: (
+      <Flag
+        code={country.alpha2}
+        style={{ width: 20, height: 20, marginRight: 8 }}
+      />
+    ),
+  }));
+
   console.log("API_URL:", API_URL);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [formData, setFormData] = useState<FormData>(initialFormData);
   const [activeTab, setActiveTab] = useState(0);
   const [errors, setErrors] = useState<Errors>({});
   const [showQRCode, setShowQRCode] = useState(false);
-  
-  const tabLabels = ["Personal Details", "Passport Details", "Contact Details", "Visa Details"];
+
+  const tabLabels = [
+    "Personal Details",
+    "Passport Details",
+    "Contact Details",
+    "Visa Details",
+  ];
   const currentSessionURL = `${FRONTEND_URL}/visa-pg-1`;
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -60,11 +79,10 @@ const VisaForm1 = () => {
   const visaId = Array.isArray(params?.id) ? params.id[0] : params?.id;
 
   useEffect(() => {
-   
-  
     if (visaId) {
-      axios.get(`${API_URL}/api/visa/${visaId}`)
-        .then(res => {
+      axios
+        .get(`${API_URL}/api/visa/${visaId}`)
+        .then((res) => {
           const data = res.data?.personalDetails;
           if (data) {
             const updatedForm: FormData = {
@@ -78,7 +96,7 @@ const VisaForm1 = () => {
             setFormData(updatedForm);
           }
         })
-        .catch(err => {
+        .catch((err) => {
           console.error("Failed to fetch visa details:", err);
         });
     } else {
@@ -100,9 +118,11 @@ const VisaForm1 = () => {
     const newErrors: Errors = {};
     if (!formData.firstName) newErrors.firstName = "First name Mandatory.";
     if (!formData.lastName) newErrors.lastName = "Last name Mandatory.";
-    if (!formData.dateOfBirth) newErrors.dateOfBirth = "Date of birth Mandatory.";
+    if (!formData.dateOfBirth)
+      newErrors.dateOfBirth = "Date of birth Mandatory.";
     if (!formData.nationality) newErrors.nationality = "Nationality Mandatory.";
-    if (!formData.maritalStatus) newErrors.maritalStatus = "Marital Status Mandatory.";
+    if (!formData.maritalStatus)
+      newErrors.maritalStatus = "Marital Status Mandatory.";
     if (!formData.Gender) newErrors.Gender = "Gender Mandatory.";
     return newErrors;
   };
@@ -111,12 +131,11 @@ const VisaForm1 = () => {
     if (index <= activeTab) setActiveTab(index);
   };
 
-
   const handleNext = async () => {
     const validationErrors = validateForm();
     setErrors(validationErrors);
     if (Object.keys(validationErrors).length > 0) return;
-  
+
     setIsSubmitting(true);
     try {
       const personalDetailsJson = {
@@ -129,43 +148,50 @@ const VisaForm1 = () => {
           gender: formData.Gender,
         },
       };
-  
+
       let response;
       if (visaId) {
-        response = await axios.put(`${API_URL}/api/visa/${visaId}`, personalDetailsJson);
+        response = await axios.put(
+          `${API_URL}/api/visa/${visaId}`,
+          personalDetailsJson
+        );
       } else {
         response = await axios.post(`${API_URL}/api/visa`, personalDetailsJson);
       }
-  
+
       const savedId = response?.data?._id;
       localStorage.setItem("visaId", savedId);
-      alert("Visa form data submitted successfully!");
+      // alert("Visa form data submitted successfully!");
+      toast.success("Visa form data submitted successfully!");
       router.push(`/visa-pg-2/${savedId}`);
     } catch (error) {
       console.error("Error saving data to MongoDB:", error);
-      alert("Error saving data. Please try again.");
+      // alert("Error saving data. Please try again.");
+      toast.error("Error saving data. Please try again.")
     } finally {
       setIsSubmitting(false);
     }
   };
-  
 
   const handleQRCodeDisplay = () => {
     setShowQRCode(!showQRCode);
   };
 
   return (
-    <div 
+    <div
       className="min-h-screen p-4 md:p-8 font-sans text-gray-800"
       style={{
         backgroundImage: "url('/visa-bg.jpg')",
-        backgroundSize: 'cover',
-        backgroundPosition: 'center',
-        backgroundAttachment: 'fixed',
+        backgroundSize: "cover",
+        backgroundPosition: "center",
+        backgroundAttachment: "fixed",
       }}
     >
       <div className="max-w-6xl mx-auto">
-        <Link href="/" className="inline-block mb-4 px-4 py-2 bg-yellow-400 hover:bg-yellow-500 text-black rounded-lg transition-colors">
+        <Link
+          href="/"
+          className="inline-block mb-4 px-4 py-2 bg-yellow-400 hover:bg-yellow-500 text-black rounded-lg transition-colors"
+        >
           ← Back to Home
         </Link>
 
@@ -176,8 +202,16 @@ const VisaForm1 = () => {
               key={index}
               onClick={() => handleTabClick(index)}
               className={`px-4 py-2 rounded-lg transition-colors
-                ${index === activeTab ? 'bg-green-600 text-white shadow-md' : 'bg-gray-200 text-gray-700'}
-                ${index <= activeTab ? 'hover:bg-green-500 cursor-pointer' : 'cursor-not-allowed opacity-50'}
+                ${
+                  index === activeTab
+                    ? "bg-green-600 text-white shadow-md"
+                    : "bg-gray-200 text-gray-700"
+                }
+                ${
+                  index <= activeTab
+                    ? "hover:bg-green-500 cursor-pointer"
+                    : "cursor-not-allowed opacity-50"
+                }
                 text-sm md:text-base`}
             >
               {label}
@@ -188,15 +222,23 @@ const VisaForm1 = () => {
         {/* Form Container */}
         <div className="bg-white bg-opacity-90 rounded-xl shadow-lg overflow-hidden">
           <div className="p-6 md:p-8">
-            <h2 className="text-2xl md:text-3xl font-bold text-center mb-6 text-green-700">Visa Application Form</h2>
-            <h3 className="text-xl font-semibold mb-2 text-gray-700">{tabLabels[activeTab]}</h3>
-            <h4 className="text-lg mb-6 text-gray-600 border-b pb-2">Personal Details:</h4>
+            <h2 className="text-2xl md:text-3xl font-bold text-center mb-6 text-green-700">
+              Visa Application Form
+            </h2>
+            <h3 className="text-xl font-semibold mb-2 text-gray-700">
+              {tabLabels[activeTab]}
+            </h3>
+            <h4 className="text-lg mb-6 text-gray-600 border-b pb-2">
+              Personal Details:
+            </h4>
 
             {activeTab === 0 && (
               <form className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 {/* First Name */}
                 <div className="flex flex-col">
-                  <label className="text-gray-700 font-medium mb-1">First Name:</label>
+                  <label className="text-gray-700 font-medium mb-1">
+                    First Name:
+                  </label>
                   <input
                     type="text"
                     name="firstName"
@@ -205,12 +247,18 @@ const VisaForm1 = () => {
                     className="p-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-green-500 focus:border-transparent"
                     placeholder="Enter your first name"
                   />
-                  {errors.firstName && <span className="text-red-500 text-sm mt-1">{errors.firstName}</span>}
+                  {errors.firstName && (
+                    <span className="text-red-500 text-sm mt-1">
+                      {errors.firstName}
+                    </span>
+                  )}
                 </div>
 
                 {/* Last Name */}
                 <div className="flex flex-col">
-                  <label className="text-gray-700 font-medium mb-1">Last Name:</label>
+                  <label className="text-gray-700 font-medium mb-1">
+                    Last Name:
+                  </label>
                   <input
                     type="text"
                     name="lastName"
@@ -219,12 +267,18 @@ const VisaForm1 = () => {
                     className="p-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-green-500 focus:border-transparent"
                     placeholder="Enter your last name"
                   />
-                  {errors.lastName && <span className="text-red-500 text-sm mt-1">{errors.lastName}</span>}
+                  {errors.lastName && (
+                    <span className="text-red-500 text-sm mt-1">
+                      {errors.lastName}
+                    </span>
+                  )}
                 </div>
 
                 {/* Date of Birth */}
                 <div className="flex flex-col">
-                  <label className="text-gray-700 font-medium mb-1">Date of Birth:</label>
+                  <label className="text-gray-700 font-medium mb-1">
+                    Date of Birth:
+                  </label>
                   <input
                     type="date"
                     name="dateOfBirth"
@@ -232,11 +286,15 @@ const VisaForm1 = () => {
                     onChange={handleChange}
                     className="p-3 rounded-lg border w-full border-gray-300 focus:ring-2 focus:ring-green-500 focus:border-transparent"
                   />
-                  {errors.dateOfBirth && <span className="text-red-500 text-sm mt-1">{errors.dateOfBirth}</span>}
+                  {errors.dateOfBirth && (
+                    <span className="text-red-500 text-sm mt-1">
+                      {errors.dateOfBirth}
+                    </span>
+                  )}
                 </div>
 
                 {/* Nationality */}
-                <div className="flex flex-col">
+                {/* <div className="flex flex-col">
                   <label className="text-gray-700 font-medium mb-1">Nationality:</label>
                   <input
                     type="text"
@@ -247,11 +305,33 @@ const VisaForm1 = () => {
                     placeholder="Enter your nationality"
                   />
                   {errors.nationality && <span className="text-red-500 text-sm mt-1">{errors.nationality}</span>}
+                </div> */}
+
+                <div className="flex flex-col">
+                  <label className="text-gray-700 font-medium mb-1">
+                    Nationality:
+                  </label>
+                  <AutocompleteField
+                    id="nationality"
+                    name="nationality"
+                    label="Select Nationality"
+                    value={formData.nationality}
+                    options={countryOptions}
+                    onChange={handleChange}
+                    required
+                  />
+                  {errors.nationality && (
+                    <span className="text-red-500 text-sm mt-1">
+                      {errors.nationality}
+                    </span>
+                  )}
                 </div>
 
                 {/* Marital Status Radio Buttons */}
                 <div className="flex flex-col md:col-span-2">
-                  <label className="text-gray-700 font-medium mb-2">Marital Status:</label>
+                  <label className="text-gray-700 font-medium mb-2">
+                    Marital Status:
+                  </label>
                   <div className="flex flex-wrap gap-4">
                     <label className="inline-flex items-center">
                       <input
@@ -287,12 +367,18 @@ const VisaForm1 = () => {
                       <span className="ml-2 text-gray-700">Divorced</span>
                     </label>
                   </div>
-                  {errors.maritalStatus && <span className="text-red-500 text-sm mt-1">{errors.maritalStatus}</span>}
+                  {errors.maritalStatus && (
+                    <span className="text-red-500 text-sm mt-1">
+                      {errors.maritalStatus}
+                    </span>
+                  )}
                 </div>
 
                 {/* Gender */}
                 <div className="flex flex-col md:col-span-2">
-                  <label className="text-gray-700 font-medium mb-2">Gender:</label>
+                  <label className="text-gray-700 font-medium mb-2">
+                    Gender:
+                  </label>
                   <div className="flex flex-wrap gap-4">
                     <label className="inline-flex items-center">
                       <input
@@ -317,7 +403,11 @@ const VisaForm1 = () => {
                       <span className="ml-2 text-gray-700">Female</span>
                     </label>
                   </div>
-                  {errors.Gender && <span className="text-red-500 text-sm mt-1">{errors.Gender}</span>}
+                  {errors.Gender && (
+                    <span className="text-red-500 text-sm mt-1">
+                      {errors.Gender}
+                    </span>
+                  )}
                 </div>
 
                 {/* Buttons */}
@@ -335,7 +425,7 @@ const VisaForm1 = () => {
                       onClick={handleQRCodeDisplay}
                       className="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors flex-1 min-w-[120px]"
                     >
-                     {showQRCode ? "Hide QR Code" : "Continue On Mobile"}
+                      {showQRCode ? "Hide QR Code" : "Continue On Mobile"}
                     </button>
                     <button
                       type="button"
@@ -349,35 +439,40 @@ const VisaForm1 = () => {
                     >
                       {isSubmitting ? "Processing..." : "Next"}
                     </button>
-                    
                   </div>
 
                   {showQRCode && (
                     <div className="mt-6 p-4 bg-gray-50 rounded-lg text-center">
-                      <h3 className="mb-3 text-lg font-medium text-gray-700">Scan QR Code to Continue on Mobile</h3>
+                      <h3 className="mb-3 text-lg font-medium text-gray-700">
+                        Scan QR Code to Continue on Mobile
+                      </h3>
                       <div className="flex justify-center">
                         <QRCodeCanvas value={currentSessionURL} size={180} />
                       </div>
-                      <p className="mt-3 text-sm text-gray-600">Scan this QR code with your mobile device to continue the application</p>
+                      <p className="mt-3 text-sm text-gray-600">
+                        Scan this QR code with your mobile device to continue
+                        the application
+                      </p>
                     </div>
                   )}
                 </div>
               </form>
             )}
-            
+
             {/* {activeTab === 1 && (
               <div className="py-12 text-center">
                 <h3 className="text-xl font-semibold text-gray-700">Passport Details - Under Construction</h3>
                 <p className="mt-2 text-gray-600">This section is currently being developed</p>
               </div>
             )} */}
-            
+
             {/* {activeTab === 2 && (
               <div className="py-12 text-center">
                 <h3 className="text-xl font-semibold text-gray-700">Review Section - Under Construction</h3>
                 <p className="mt-2 text-gray-600">This section is currently being developed</p>
               </div>
             )} */}
+            <Toaster position="top-right" reverseOrder={false} />
           </div>
         </div>
       </div>

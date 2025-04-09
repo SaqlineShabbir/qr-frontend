@@ -10,11 +10,14 @@
   },
   "dependencies": {
     "axios": "^1.8.4",
+    "country-data": "^0.0.31",
     "next": "15.2.4",
     "next-qrcode": "^2.5.1",
     "qrcode.react": "^4.2.0",
     "react": "^19.0.0",
-    "react-dom": "^19.0.0"
+    "react-dom": "^19.0.0",
+    "react-hot-toast": "^2.5.2",
+    "react-world-flags": "^1.6.0"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",
