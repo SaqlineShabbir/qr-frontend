@@ -332,6 +332,13 @@ const VisaForm1 = () => {
                     </button>
                     <button
                       type="button"
+                      onClick={handleQRCodeDisplay}
+                      className="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors flex-1 min-w-[120px]"
+                    >
+                     {showQRCode ? "Hide QR Code" : "Continue On Mobile"}
+                    </button>
+                    <button
+                      type="button"
                       onClick={handleNext}
                       disabled={isSubmitting}
                       className={`px-6 py-3 rounded-lg transition-colors flex-1 min-w-[120px] ${
@@ -342,13 +349,7 @@ const VisaForm1 = () => {
                     >
                       {isSubmitting ? "Processing..." : "Next"}
                     </button>
-                    <button
-                      type="button"
-                      onClick={handleQRCodeDisplay}
-                      className="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors flex-1 min-w-[120px]"
-                    >
-                     {showQRCode ? "Hide QR Code" : "Continue On Mobile"}
-                    </button>
+                    
                   </div>
 
                   {showQRCode && (

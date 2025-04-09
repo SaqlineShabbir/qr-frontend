@@ -304,7 +304,7 @@ useEffect(() => {
                       href={`/visa-pg-2/${id}`}
                       className="px-6 py-3 bg-gray-200 hover:bg-gray-300 text-gray-800 rounded-lg transition-colors flex-1 min-w-[120px] text-center"
                     >
-                      Back
+                       ← Back
                     </Link>
                     <button
                       type="button"
