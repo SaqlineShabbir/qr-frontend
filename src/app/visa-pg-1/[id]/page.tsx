@@ -82,10 +82,10 @@ const VisaForm1 = () => {
           console.error("Failed to fetch visa details:", err);
         });
     } else {
-      const savedForm = localStorage.getItem("visaFormDataOne");
-      if (savedForm) {
-        setFormData(JSON.parse(savedForm));
-      }
+      // const savedForm = localStorage.getItem("visaFormDataOne");
+      // if (savedForm) {
+      //   setFormData(JSON.parse(savedForm));
+      // }
     }
   }, []);
 
