@@ -5,6 +5,7 @@ import axios from "axios";
 import Link from "next/link";
 import Head from "next/head";
 import { useParams, useRouter } from "next/navigation";
+import toast from "react-hot-toast";
 
 type FormData = {
   visaType: string;
@@ -104,7 +105,10 @@ const VisaForm4 = () => {
 
       localStorage.setItem("visaId", response?.data?._id);
       alert("Visa form data submitted successfully!");
+     
+      
       setIsSuccess(true);
+      router.push(`/success`);
     } catch (error) {
       console.error("Error saving data to MongoDB:", error);
       alert("Error saving data. Please try again.");
@@ -177,7 +181,7 @@ const VisaForm4 = () => {
           </Link>
 
           {/* Tabs */}
-          <div className="flex flex-wrap justify-center gap-2 mb-8">
+          {/* <div className="flex flex-wrap justify-center gap-2 mb-8">
             {tabLabels.map((label, index) => (
               <button
                 key={index}
@@ -198,17 +202,13 @@ const VisaForm4 = () => {
                 {label}
               </button>
             ))}
-          </div>
+          </div> */}
 
           {/* Form Container */}
           <div className="bg-white bg-opacity-90 rounded-xl shadow-lg overflow-hidden">
-            {isSuccess ? (
-              <div className="p-8 text-center">
-                <h2 className="text-2xl md:text-3xl font-bold text-center mb-6 text-green-700">
-                  Visa Application Form submitted successfully
-                </h2>
-              </div>
-            ) : (
+           
+            
+           
               <div className="p-6 md:p-8">
                 <h2 className="text-2xl md:text-3xl font-bold text-center mb-6 text-green-700">
                   Visa Application Form
@@ -402,7 +402,7 @@ const VisaForm4 = () => {
                   </div>
                 </form>
               </div>
-            )}
+           
           </div>
         </div>
       </div>

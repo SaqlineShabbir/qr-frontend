@@ -166,7 +166,7 @@ useEffect(() => {
           </Link>
 
           {/* Tabs */}
-          <div className="flex flex-wrap justify-center gap-2 mb-8">
+          {/* <div className="flex flex-wrap justify-center gap-2 mb-8">
             {tabLabels.map((label, index) => (
               <button
                 key={index}
@@ -179,7 +179,7 @@ useEffect(() => {
                 {label}
               </button>
             ))}
-          </div>
+          </div> */}
 
           {/* Form Container */}
           <div className="bg-white bg-opacity-90 rounded-xl shadow-lg overflow-hidden">

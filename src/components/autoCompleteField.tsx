@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 
 interface AutocompleteFieldProps {
   id: string;
@@ -29,7 +29,9 @@ const AutocompleteField: React.FC<AutocompleteFieldProps> = ({
   const [inputValue, setInputValue] = useState(value);
   const [filteredOptions, setFilteredOptions] = useState(options);
   const [optionClicked, setOptionClicked] = useState(false);
-
+  useEffect(() => {
+    setInputValue(value);
+  }, [value]);
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const inputValue = e.target.value;
     setInputValue(inputValue);

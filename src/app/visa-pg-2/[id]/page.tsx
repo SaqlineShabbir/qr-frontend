@@ -11,7 +11,6 @@ type FormData = {
   placeofIssue: string;
   dateOfIssue: string;
   dateOfExpiry: string;
-  
 };
 
 type FormErrors = {
@@ -19,7 +18,6 @@ type FormErrors = {
   placeofIssue?: string;
   dateOfIssue?: string;
   dateOfExpiry?: string;
- 
 };
 
 const VisaForm2 = () => {
@@ -42,6 +40,7 @@ const VisaForm2 = () => {
   const [activeTab, setActiveTab] = useState(1); // Set to 1 for Passport Details tab
   const currentSessionURL = `${FRONTEND_URL}/visa-pg-2/${id}`;
   const [passportFile, setPassportFile] = useState<File | null>(null);
+  const [passportPreview, setPassportPreview] = useState<string | null>(null);
   const tabLabels = [
     "Personal Details",
     "Passport Details",
@@ -65,24 +64,25 @@ const VisaForm2 = () => {
               dateOfExpiry: data.dateOfExpiry?.substring(0, 10) || "",
             };
             setFormData(updatedForm);
-            localStorage.setItem("visaFormData", JSON.stringify(updatedForm));
-            localStorage.setItem("visaId", visaId);
+
+            // Handle existing passport scan preview
+            if (data.passportCopy) {
+              const filePath = data.passportCopy.replace(/\\/g, "/");
+              if (filePath.endsWith(".pdf")) {
+                // Show PDF icon for existing PDFs
+                setPassportPreview("pdf");
+              } else {
+                // Show image preview for existing images
+                setPassportPreview(`${API_URL}/${filePath}`);
+              }
+            }
           }
         })
         .catch((err) => {
           console.error("Failed to fetch visa details:", err);
         });
-    } else {
-      const savedFormData = localStorage.getItem("visaFormData");
-      if (savedFormData) {
-        try {
-          setFormData(JSON.parse(savedFormData));
-        } catch (error) {
-          console.error("Error parsing visaFormData from localStorage:", error);
-        }
-      }
     }
-  }, []);
+  }, [id, API_URL]);
 
   useEffect(() => {
     localStorage.setItem("visaFormData", JSON.stringify(formData));
@@ -109,7 +109,7 @@ const VisaForm2 = () => {
       newErrors.dateOfIssue = "Date of issue is required";
     if (!formData.dateOfExpiry)
       newErrors.dateOfExpiry = "Date of expiry is required";
-    
+
     return newErrors;
   };
 
@@ -146,6 +146,17 @@ const VisaForm2 = () => {
 
       setPassportFile(file);
       setErrors((prev) => ({ ...prev, passportFile: "" }));
+
+      // Create preview for images (not for PDFs)
+      if (file.type.startsWith("image/")) {
+        const reader = new FileReader();
+        reader.onloadend = () => {
+          setPassportPreview(reader.result as string);
+        };
+        reader.readAsDataURL(file);
+      } else {
+        setPassportPreview(null); // No preview for PDFs
+      }
     }
   };
   console.log("passportFile", passportFile);
@@ -159,6 +170,8 @@ const VisaForm2 = () => {
     setIsSubmitting(true);
     try {
       const formDataToSend = new FormData();
+
+      
 
       // Append all form fields
       Object.entries(formData).forEach(([key, value]) => {
@@ -230,7 +243,7 @@ const VisaForm2 = () => {
           </Link>
 
           {/* Tabs */}
-          <div className="flex flex-wrap justify-center gap-2 mb-8">
+          {/* <div className="flex flex-wrap justify-center gap-2 mb-8">
             {tabLabels.map((label, index) => (
               <button
                 key={index}
@@ -251,7 +264,7 @@ const VisaForm2 = () => {
                 {label}
               </button>
             ))}
-          </div>
+          </div> */}
 
           {/* Form Container */}
           <div className="bg-white bg-opacity-90 rounded-xl shadow-lg overflow-hidden">
@@ -354,18 +367,61 @@ const VisaForm2 = () => {
                     </span>
                   )}
                 </div>
-                <div className="flex flex-col">
+                <div className="flex flex-col md:col-span-2">
                   <label className="text-gray-700 font-medium mb-1">
                     Upload Passport Scan:
                   </label>
-                  <input
-                    name="passportCopy"
-                    type="file"
-                    accept=".pdf,.jpg,.jpeg,.png"
-                    onChange={handleFileChange}
-                    className={`p-3 rounded-lg border focus:ring-2 focus:ring-green-500 focus:border-transparent  border-gray-300
-                    }`}
-                  />
+                  <div className="flex items-center gap-4">
+                    <div className="relative">
+                      <input
+                        name="passportCopy"
+                        type="file"
+                        accept=".pdf,.jpg,.jpeg,.png"
+                        onChange={handleFileChange}
+                        
+                        className={`p-3 rounded-lg border focus:ring-2 focus:ring-green-500 focus:border-transparent border-gray-300`}
+                      />
+                    </div>
+                    {passportPreview && (
+                      <div className="w-32 h-32 border-2 border-gray-300 rounded-lg overflow-hidden">
+                        <img
+                          src={passportPreview}
+                          alt="Passport preview"
+                          className="w-full h-full object-contain"
+                        />
+                      </div>
+                    )}
+                    {passportFile &&
+                      passportFile.type === "application/pdf" && (
+                        <div className="w-32 h-32 border-2 border-gray-300 rounded-lg flex items-center justify-center bg-gray-100">
+                          <div className="text-center p-2">
+                            <svg
+                              className="w-10 h-10 mx-auto text-red-500"
+                              fill="none"
+                              stroke="currentColor"
+                              viewBox="0 0 24 24"
+                              xmlns="http://www.w3.org/2000/svg"
+                            >
+                              <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth={2}
+                                d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"
+                              />
+                            </svg>
+                            <p className="text-xs mt-1 text-gray-600">
+                              PDF File
+                            </p>
+                            <p className="text-xs text-gray-500 truncate">
+                              {passportFile.name}
+                            </p>
+                          </div>
+                        </div>
+                      )}
+                  </div>
+                  {/* {errors.passportFile && (
+    <span className="text-red-500 text-sm mt-1">{errors.passportFile}</span>
+  )} */}
                 </div>
 
                 {/* Buttons */}

@@ -1,7 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import Link from "next/link";
-
+import { Image, ImagePlus, Upload, X } from "lucide-react";
 import { QRCodeCanvas } from "qrcode.react";
 import axios from "axios";
 import { useRouter, useParams } from "next/navigation";
@@ -16,6 +16,7 @@ type FormData = {
   nationality: string;
   maritalStatus: string;
   Gender: string;
+  photo: string;
 };
 
 type Errors = {
@@ -25,6 +26,7 @@ type Errors = {
   nationality?: string;
   maritalStatus?: string;
   Gender?: string;
+  photo?: string;
 };
 
 const VisaForm1 = () => {
@@ -35,6 +37,7 @@ const VisaForm1 = () => {
     nationality: "",
     maritalStatus: "",
     Gender: "",
+    photo: "",
   };
 
   const API_URL = process.env.NEXT_PUBLIC_API_URL;
@@ -52,13 +55,14 @@ const VisaForm1 = () => {
     ),
   }));
 
-  console.log("API_URL:", API_URL);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [formData, setFormData] = useState<FormData>(initialFormData);
   const [activeTab, setActiveTab] = useState(0);
   const [errors, setErrors] = useState<Errors>({});
   const [showQRCode, setShowQRCode] = useState(false);
 
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const tabLabels = [
     "Personal Details",
     "Passport Details",
@@ -84,6 +88,7 @@ const VisaForm1 = () => {
         .get(`${API_URL}/api/visa/${visaId}`)
         .then((res) => {
           const data = res.data?.personalDetails;
+          console.log("Fetched data:", data);
           if (data) {
             const updatedForm: FormData = {
               firstName: data.firstName || "",
@@ -92,8 +97,15 @@ const VisaForm1 = () => {
               nationality: data.nationality || "",
               maritalStatus: data.maritalStatus || "",
               Gender: data.gender || "",
+              photo: data.photo || "",
             };
             setFormData(updatedForm);
+
+            // If there's an existing photo, set the preview URL
+            if (data.photo) {
+              const photoPath = data.photo.replace(/\\/g, "/");
+              setPreviewUrl(`${API_URL}/${photoPath}`);
+            }
           }
         })
         .catch((err) => {
@@ -106,6 +118,20 @@ const VisaForm1 = () => {
       // }
     }
   }, []);
+  // Add this handler for file selection
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+      const file = e.target.files[0];
+      setSelectedFile(file);
+
+      // Create preview URL
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setPreviewUrl(reader.result as string);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
 
   const handleReset = () => {
     setFormData(initialFormData);
@@ -131,6 +157,7 @@ const VisaForm1 = () => {
     if (index <= activeTab) setActiveTab(index);
   };
 
+  // Modify your handleNext function to handle file upload
   const handleNext = async () => {
     const validationErrors = validateForm();
     setErrors(validationErrors);
@@ -138,36 +165,47 @@ const VisaForm1 = () => {
 
     setIsSubmitting(true);
     try {
-      const personalDetailsJson = {
-        personalDetails: {
-          firstName: formData.firstName,
-          lastName: formData.lastName,
-          dateOfBirth: formData.dateOfBirth,
-          nationality: formData.nationality,
-          maritalStatus: formData.maritalStatus,
-          gender: formData.Gender,
-        },
-      };
+      const formDataToSend = new FormData();
+
+      // Append text data
+      formDataToSend.append("firstName", formData.firstName);
+      formDataToSend.append("lastName", formData.lastName);
+      formDataToSend.append("dateOfBirth", formData.dateOfBirth);
+      formDataToSend.append("nationality", formData.nationality);
+      formDataToSend.append("maritalStatus", formData.maritalStatus);
+      formDataToSend.append("gender", formData.Gender);
+
+      // Append file if selected
+      if (selectedFile) {
+        formDataToSend.append("photo", selectedFile);
+      }
 
       let response;
       if (visaId) {
         response = await axios.put(
-          `${API_URL}/api/visa/${visaId}`,
-          personalDetailsJson
+          `${API_URL}/api/visa/${visaId}/photo`,
+          formDataToSend,
+          {
+            headers: {
+              "Content-Type": "multipart/form-data",
+            },
+          }
         );
       } else {
-        response = await axios.post(`${API_URL}/api/visa`, personalDetailsJson);
+        response = await axios.post(`${API_URL}/api/visa`, formDataToSend, {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        });
       }
 
       const savedId = response?.data?._id;
       localStorage.setItem("visaId", savedId);
-      // alert("Visa form data submitted successfully!");
       toast.success("Visa form data submitted successfully!");
       router.push(`/visa-pg-2/${savedId}`);
     } catch (error) {
       console.error("Error saving data to MongoDB:", error);
-      // alert("Error saving data. Please try again.");
-      toast.error("Error saving data. Please try again.")
+      toast.error("Error saving data. Please try again.");
     } finally {
       setIsSubmitting(false);
     }
@@ -176,6 +214,9 @@ const VisaForm1 = () => {
   const handleQRCodeDisplay = () => {
     setShowQRCode(!showQRCode);
   };
+
+
+  console.log("Form Data:", formData.nationality);
 
   return (
     <div
@@ -196,7 +237,7 @@ const VisaForm1 = () => {
         </Link>
 
         {/* Tabs */}
-        <div className="flex flex-wrap justify-center gap-2 mb-8">
+        {/* <div className="flex flex-wrap justify-center gap-2 mb-8">
           {tabLabels.map((label, index) => (
             <button
               key={index}
@@ -217,7 +258,7 @@ const VisaForm1 = () => {
               {label}
             </button>
           ))}
-        </div>
+        </div> */}
 
         {/* Form Container */}
         <div className="bg-white bg-opacity-90 rounded-xl shadow-lg overflow-hidden">
@@ -235,6 +276,41 @@ const VisaForm1 = () => {
             {activeTab === 0 && (
               <form className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 {/* First Name */}
+                <div className="flex flex-col md:col-span-2">
+  <label className="text-gray-700 font-medium mb-2 flex items-center gap-2">
+    <Image className="w-5 h-5" /> Photo:
+  </label>
+  <div className="flex items-center gap-4">
+    <div className="relative">
+      <input
+        type="file"
+        id="photo-upload"
+        accept="image/*"
+        onChange={handleFileChange}
+        className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+      />
+      <label
+        htmlFor="photo-upload"
+        className="inline-flex items-center gap-2 px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg cursor-pointer transition-colors border border-gray-300"
+      >
+        <Upload className="w-5 h-5" />
+        <span>Upload</span>
+      </label>
+    </div>
+    {previewUrl && (
+      <div className="relative group">
+        <div className="w-16 h-16 rounded-full overflow-hidden border-2 border-gray-300">
+          <img
+            src={previewUrl}
+            alt="Preview"
+            className="w-full h-full object-cover"
+          />
+        </div>
+        
+      </div>
+    )}
+  </div>
+</div>
                 <div className="flex flex-col">
                   <label className="text-gray-700 font-medium mb-1">
                     First Name:
