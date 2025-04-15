@@ -215,14 +215,13 @@ const VisaForm1 = () => {
     setShowQRCode(!showQRCode);
   };
 
-
   console.log("Form Data:", formData.nationality);
 
   return (
     <div
       className="min-h-screen p-4 md:p-8 font-sans text-gray-800"
       style={{
-        backgroundImage: "url('/visa-bg.jpg')",
+        backgroundImage: "url('/images/visa-bg.jpg')",
         backgroundSize: "cover",
         backgroundPosition: "center",
         backgroundAttachment: "fixed",
@@ -277,40 +276,39 @@ const VisaForm1 = () => {
               <form className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 {/* First Name */}
                 <div className="flex flex-col md:col-span-2">
-  <label className="text-gray-700 font-medium mb-2 flex items-center gap-2">
-    <Image className="w-5 h-5" /> Photo:
-  </label>
-  <div className="flex items-center gap-4">
-    <div className="relative">
-      <input
-        type="file"
-        id="photo-upload"
-        accept="image/*"
-        onChange={handleFileChange}
-        className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
-      />
-      <label
-        htmlFor="photo-upload"
-        className="inline-flex items-center gap-2 px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg cursor-pointer transition-colors border border-gray-300"
-      >
-        <Upload className="w-5 h-5" />
-        <span>Upload</span>
-      </label>
-    </div>
-    {previewUrl && (
-      <div className="relative group">
-        <div className="w-16 h-16 rounded-full overflow-hidden border-2 border-gray-300">
-          <img
-            src={previewUrl}
-            alt="Preview"
-            className="w-full h-full object-cover"
-          />
-        </div>
-        
-      </div>
-    )}
-  </div>
-</div>
+                  <label className="text-gray-700 font-medium mb-2 flex items-center gap-2">
+                    <Image className="w-5 h-5" /> Photo:
+                  </label>
+                  <div className="flex items-center gap-4">
+                    <div className="relative">
+                      <input
+                        type="file"
+                        id="photo-upload"
+                        accept="image/*"
+                        onChange={handleFileChange}
+                        className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                      />
+                      <label
+                        htmlFor="photo-upload"
+                        className="inline-flex items-center gap-2 px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg cursor-pointer transition-colors border border-gray-300"
+                      >
+                        <Upload className="w-5 h-5" />
+                        <span>Upload</span>
+                      </label>
+                    </div>
+                    {previewUrl && (
+                      <div className="relative group">
+                        <div className="w-16 h-16 rounded-full overflow-hidden border-2 border-gray-300">
+                          <img
+                            src={previewUrl}
+                            alt="Preview"
+                            className="w-full h-full object-cover"
+                          />
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                </div>
                 <div className="flex flex-col">
                   <label className="text-gray-700 font-medium mb-1">
                     First Name:
@@ -360,6 +358,7 @@ const VisaForm1 = () => {
                     name="dateOfBirth"
                     value={formData.dateOfBirth}
                     onChange={handleChange}
+                    max={new Date().toISOString().split("T")[0]} 
                     className="p-3 rounded-lg border w-full border-gray-300 focus:ring-2 focus:ring-green-500 focus:border-transparent"
                   />
                   {errors.dateOfBirth && (

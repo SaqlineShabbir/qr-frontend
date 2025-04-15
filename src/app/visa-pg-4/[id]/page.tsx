@@ -164,9 +164,9 @@ const VisaForm4 = () => {
       </Head>
 
       <div
-        className="min-h-screen p-4 md:p-8 font-sans text-gray-800"
+        className="min-h-screen p-4 md:p-8 font-sans  text-gray-800"
         style={{
-          backgroundImage: "url('/visa-bg.jpg')",
+          backgroundImage: "url('/images/visa-bg.jpg')",
           backgroundSize: "cover",
           backgroundPosition: "center",
           backgroundAttachment: "fixed",

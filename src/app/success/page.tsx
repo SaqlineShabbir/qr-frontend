@@ -5,8 +5,13 @@ type Props = {}
 
 const page = (props: Props) => {
   return (
-    <div className="p-8 h-screen text-center flex flex-col items-center justify-center">
-    <div className=" p-8 rounded-lg  max-w-2xl">
+    <div   style={{
+      backgroundImage: "url('/images/visa-bg.jpg')",
+      backgroundSize: "cover",
+      backgroundPosition: "center",
+      backgroundAttachment: "fixed",
+    }} className=" h-screen text-center flex flex-col items-center justify-center">
+    <div className=" p-4 md:p-0 rounded-lg  max-w-2xl">
    <div className='flex justify-start items-center mb-4'>
    <Link
             href="/"
@@ -15,6 +20,7 @@ const page = (props: Props) => {
             ← Back to Home
           </Link>
    </div>
+      <div className='bg-white mx-auto md:p-8 p-4 rounded-lg shadow-lg'>
       <div className="text-green-500 mb-4">
         <svg className="w-16 h-16 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
@@ -45,6 +51,7 @@ const page = (props: Props) => {
         >
           Check Application Status
         </a> */}
+      </div>
       </div>
     </div>
   </div>

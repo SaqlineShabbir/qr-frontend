@@ -229,7 +229,7 @@ const VisaForm2 = () => {
       <div
         className="min-h-screen p-4 md:p-8 font-sans text-gray-800"
         style={{
-          backgroundImage: "url('/visa-bg.jpg')",
+          backgroundImage: "url('/images/visa-bg.jpg')",
           backgroundSize: "cover",
           backgroundPosition: "center",
           backgroundAttachment: "fixed",
@@ -337,6 +337,7 @@ const VisaForm2 = () => {
                     name="dateOfIssue"
                     value={formData.dateOfIssue}
                     onChange={handleChange}
+                    max={new Date().toISOString().split("T")[0]} 
                     className={`p-3 rounded-lg border focus:ring-2 focus:ring-green-500 focus:border-transparent ${
                       errors.dateOfIssue ? "border-red-500" : "border-gray-300"
                     }`}
@@ -358,6 +359,7 @@ const VisaForm2 = () => {
                     name="dateOfExpiry"
                     value={formData.dateOfExpiry}
                     onChange={handleChange}
+                    min={new Date().toISOString().split("T")[0]}
                     className={`p-3 rounded-lg border focus:ring-2 focus:ring-green-500 focus:border-transparent ${
                       errors.dateOfExpiry ? "border-red-500" : "border-gray-300"
                     }`}
