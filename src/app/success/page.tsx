@@ -6,7 +6,8 @@ type Props = {}
 const page = (props: Props) => {
   return (
     <div   style={{
-      backgroundImage: "url('/images/visa-bg.jpg')",
+      backgroundImage:
+          "linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)), url('/images/visa-bg.jpg')",
       backgroundSize: "cover",
       backgroundPosition: "center",
       backgroundAttachment: "fixed",

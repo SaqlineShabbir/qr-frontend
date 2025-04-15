@@ -229,7 +229,8 @@ const VisaForm2 = () => {
       <div
         className="min-h-screen p-4 md:p-8 font-sans text-gray-800"
         style={{
-          backgroundImage: "url('/images/visa-bg.jpg')",
+          backgroundImage:
+          "linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)), url('/images/visa-bg.jpg')",
           backgroundSize: "cover",
           backgroundPosition: "center",
           backgroundAttachment: "fixed",
