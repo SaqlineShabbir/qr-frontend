@@ -116,7 +116,7 @@ const VisaForm2 = () => {
   const handleTabClick = (index: number) => {
     if (index <= activeTab) setActiveTab(index);
     if (index === 0) {
-      router.push(`/visa-pg-1`);
+      router.push(`/visa-pg-1/${id}`);
     }
   };
 
@@ -244,7 +244,7 @@ const VisaForm2 = () => {
           </Link>
 
           {/* Tabs */}
-          {/* <div className="flex flex-wrap justify-center gap-2 mb-8">
+          <div className="flex flex-wrap justify-center gap-2 mb-8">
             {tabLabels.map((label, index) => (
               <button
                 key={index}
@@ -265,7 +265,7 @@ const VisaForm2 = () => {
                 {label}
               </button>
             ))}
-          </div> */}
+          </div>
 
           {/* Form Container */}
           <div className="bg-white bg-opacity-90 rounded-xl shadow-lg overflow-hidden">
