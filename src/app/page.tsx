@@ -1,14 +1,47 @@
 "use client";
 
 import { useState } from "react";
-import Link from "next/link";
+import axios from "axios";
+import { useRouter } from "next/navigation";
+import toast, { Toaster } from "react-hot-toast";
 
 const Home = () => {
   const [language, setLanguage] = useState("English");
+  const [isLoading, setIsLoading] = useState(false);
+  const router = useRouter();
+  const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
-  const handleLanguageChange = (
-    event: React.ChangeEvent<HTMLSelectElement>
-  ) => {
+  const handleApplication = async () => {
+    setIsLoading(true);
+    try {
+      // Make POST request to create new visa application
+      const response = await axios.post(`${API_URL}/api/visa`, {
+        // Initial empty data
+        firstName: "",
+        lastName: "",
+        dateOfBirth: "",
+        nationality: "",
+        maritalStatus: "",
+        gender: "",
+        photo: ""
+      });
+
+      const id = response.data._id; // Get the ID from backend response
+  
+      toast.success("Visa application process started!");
+      
+      // Navigate to visa-pg-1 with the ID
+      router.push(`/visa-pg-1/${id}`);
+    } catch (error) {
+      console.error("Error creating visa application:", error);
+     
+      toast.error("Failed to start visa application. Please try again.");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleLanguageChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
     setLanguage(event.target.value);
     alert(`Language changed to: ${event.target.value}`);
   };
@@ -23,10 +56,9 @@ const Home = () => {
         backgroundAttachment: "fixed",
       }}
     >
-      {/* Language Dropdown - More elegant */}
+      {/* Language Dropdown */}
       <div className="absolute right-5 top-5 z-10">
         <div className="flex items-center space-x-2">
-          {/* <GlobeIcon className="h-5 w-5 text-white" /> */}
           <select
             id="language-select"
             value={language}
@@ -70,16 +102,19 @@ const Home = () => {
           <p className="mb-6 text-gray-200">
             Start your visa application process with our simple online form
           </p>
-          <Link
-            href="/visa-pg-1"
-            className="inline-block bg-yellow-400 hover:bg-yellow-500 text-black font-semibold px-8 py-3 rounded-lg transition-colors shadow-md"
+          <button
+            onClick={handleApplication}
+            disabled={isLoading}
+            className={`inline-block bg-yellow-400 hover:bg-yellow-500 text-black font-semibold px-8 py-3 rounded-lg transition-colors shadow-md cursor-pointer${
+              isLoading ? "opacity-70 cursor-not-allowed" : ""
+            }`}
           >
-            Begin Visa Application
-          </Link>
+            {isLoading ? "Starting Application..." : "Begin Visa Application"}
+          </button>
         </div>
       </main>
 
-      {/* Bottom Note - More readable */}
+      {/* Bottom Note */}
       <div className="absolute bottom-8 w-full px-4">
         <div className="max-w-4xl mx-auto bg-black/50 backdrop-blur-sm rounded-lg p-4 border border-white/10">
           <p className="text-sm text-yellow-100">
@@ -93,6 +128,7 @@ const Home = () => {
           </p>
         </div>
       </div>
+      <Toaster position="top-right" reverseOrder={false} />
     </div>
   );
 };
