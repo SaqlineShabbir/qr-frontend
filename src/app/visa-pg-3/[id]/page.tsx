@@ -319,7 +319,7 @@ useEffect(() => {
                 </div>
 
                 {/* Buttons */}
-                <div className="flex flex-col md:col-span-2 gap-4 mt-4 mb-[300px]">
+                <div className="flex flex-col md:col-span-2 gap-4 mt-4 ">
                   <div className="flex flex-wrap justify-between gap-4">
                     <Link 
                       href={`/visa-pg-2/${id}`}
@@ -334,16 +334,14 @@ useEffect(() => {
                     >
                       Reset
                     </button>
-                    <div className="">
-                    <QrGenerator visaId={id} page="visa-pg-3" />
-                    </div>
-                    {/* <button
+                    
+                    <button
                       type="button"
                       onClick={handleQRCodeDisplay}
                       className="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors flex-1 min-w-[120px]"
                     >
                       {showQRCode ? "Hide QR Code" : "Continue On Mobile"}
-                    </button> */}
+                    </button>
                     <button
                       type="submit"
                       disabled={isSubmitting}
@@ -357,7 +355,7 @@ useEffect(() => {
                     </button>
                   </div>
 
-                  {/* {showQRCode && (
+                  {showQRCode && (
                     <div className="mt-6 p-4 bg-gray-50 rounded-lg text-center">
                       <h3 className="mb-3 text-lg font-medium text-gray-700">Scan QR Code to Continue on Mobile</h3>
                       <div className="flex justify-center">
@@ -365,7 +363,7 @@ useEffect(() => {
                       </div>
                       <p className="mt-3 text-sm text-gray-600">Scan this QR code with your mobile device to continue the application</p>
                     </div>
-                  )} */}
+                  )}
                 </div>
               </form>
             </div>

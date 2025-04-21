@@ -230,26 +230,8 @@ const VisaForm1 = () => {
     }
   };
 
-  const handleQRCodeDisplay = async () => {
-    if (showQRCode) {
-      setShowQRCode(false);
-      return;
-    }
-
-    try {
-      const response = await axios.post(`${API_URL}/api/qr/generate`, {
-        visaId,
-      });
-      setQrData({
-        url: response.data.qrUrl,
-        token: response.data.token,
-      });
-      setShowQRCode(true);
-      toast.success("QR code generated!");
-    } catch (error) {
-      console.log("Error generating QR code:", error);
-      toast.error("Failed to generate QR code");
-    }
+  const handleQRCodeDisplay = () => {
+    setShowQRCode(!showQRCode);
   };
 
   console.log("Form Data:", formData.nationality);
@@ -513,7 +495,7 @@ const VisaForm1 = () => {
 
                 {/* Buttons */}
                 <div className="flex flex-col md:col-span-2 gap-4 mt-4">
-                  <div className="flex flex-wrap justify-between gap-4 mb-[300px]">
+                  <div className="flex flex-wrap justify-between gap-4 ">
                     <button
                       type="button"
                       onClick={handleReset}
@@ -521,16 +503,14 @@ const VisaForm1 = () => {
                     >
                       Reset
                     </button>
-                    {/* <button
+                    <button
                       type="button"
                       onClick={handleQRCodeDisplay}
                       className="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors flex-1 min-w-[120px]"
                     >
                       {showQRCode ? "Hide QR Code" : "Continue On Mobile"}
-                    </button> */}
-                    <div className="">
-                      <QrGenerator visaId={visaId} page="visa-pg-1" />
-                    </div>
+                    </button>
+                   
                     <button
                       type="button"
                       onClick={handleNext}
@@ -545,28 +525,20 @@ const VisaForm1 = () => {
                     </button>
                   </div>
 
-                  {/* {showQRCode && qrData && (
-                    <div className="mt-6 p-4 bg-gray-50 rounded-lg text-center">
-                      <h3 className="mb-3 text-lg font-medium text-gray-700">
-                        Scan QR Code to Continue on Mobile
-                      </h3>
-                      <div className="flex justify-center">
-                        <QRCodeCanvas value={qrData.url} size={180} />
+                  {showQRCode && (
+                      <div className="mt-6 p-4 bg-gray-50 rounded-lg text-center">
+                        <h3 className="mb-3 text-lg font-medium text-gray-700">
+                          Scan QR Code to Continue on Mobile
+                        </h3>
+                        <div className="flex justify-center">
+                          <QRCodeCanvas value={currentSessionURL} size={180} />
+                        </div>
+                        <p className="mt-3 text-sm text-gray-600">
+                          Scan this QR code with your mobile device to continue
+                          the application
+                        </p>
                       </div>
-                      <p className="mt-3 text-sm text-gray-600">
-                        This code will expire after first use
-                      </p>
-                      <button
-                        onClick={() => {
-                          navigator.clipboard.writeText(qrData.url);
-                          toast.success("Link copied to clipboard!");
-                        }}
-                        className="mt-2 text-sm text-blue-600 hover:text-blue-800"
-                      >
-                        Copy link instead
-                      </button>
-                    </div>
-                  )} */}
+                    )}
                 </div>
               </form>
             )}

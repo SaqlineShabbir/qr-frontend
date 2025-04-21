@@ -450,7 +450,7 @@ const VisaForm2 = () => {
                 </div>
 
                 {/* Buttons */}
-                <div className="flex flex-col md:col-span-2 gap-4 mt-4 mb-[300px]">
+                <div className="flex flex-col md:col-span-2 gap-4 mt-4 ">
                   <div className="flex flex-wrap justify-between gap-4">
                     <Link
                       href={`/visa-pg-1/${id}`}
@@ -465,14 +465,14 @@ const VisaForm2 = () => {
                     >
                       Reset
                     </button>
-                    {/* <button
+                    <button
                       type="button"
                       onClick={handleQRCodeDisplay}
                       className="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors flex-1 min-w-[120px]"
                     >
                       {showQRCode ? "Hide QR Code" : "Continue On Mobile"}
-                    </button> */}
-                        <QrGenerator visaId={id} page="visa-pg-2" />
+                    </button>
+                      
                     <button
                       type="button"
                       onClick={handleNext}
@@ -487,7 +487,7 @@ const VisaForm2 = () => {
                     </button>
                   </div>
 
-                  {/* {showQRCode && (
+                  {showQRCode && (
                     <div className="mt-6 p-4 bg-gray-50 rounded-lg text-center">
                       <h3 className="mb-3 text-lg font-medium text-gray-700">
                         Scan QR Code to Continue on Mobile
@@ -500,7 +500,7 @@ const VisaForm2 = () => {
                         the application
                       </p>
                     </div>
-                  )} */}
+                  )}
                 </div>
               </form>
             </div>
