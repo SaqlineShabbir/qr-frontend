@@ -60,9 +60,24 @@ const VisaForm4 = () => {
     setFormData({ ...formData, [name]: value });
   };
 
-  const handleReset = () => {
-    setFormData(initialFormData);
-    setErrors({});
+ 
+  const handleReset = async () => {
+  
+    try {
+      setFormData(initialFormData);
+      setErrors({});
+      const res = await fetch(`${API_URL}/api/visa/visa-form/${id}/reset-section`, {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          section: "visaDetails",
+        }),
+      });
+    } catch (error) {
+      console.error("Error resetting section:", error);
+    }
   };
 
   const validateForm = (): FormErrors => {

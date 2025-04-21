@@ -138,11 +138,25 @@ const VisaForm1 = () => {
     }
   };
 
-  const handleReset = () => {
-    setFormData(initialFormData);
-    setErrors({});
-    localStorage.removeItem("visaFormData");
-    localStorage.removeItem("visaFormDataOne");
+  const handleReset = async () => {
+
+    try {
+      setFormData(initialFormData);
+      setErrors({});
+    
+
+      const res = await fetch(`${API_URL}/api/visa/visa-form/${visaId}/reset-section`, {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          section: "personalDetails",
+        }),
+      });
+    } catch (error) {
+      console.error("Error resetting section:", error);
+    }
   };
 
   const validateForm = (): Errors => {
@@ -392,19 +406,7 @@ const VisaForm1 = () => {
                   )}
                 </div>
 
-                {/* Nationality */}
-                {/* <div className="flex flex-col">
-                  <label className="text-gray-700 font-medium mb-1">Nationality:</label>
-                  <input
-                    type="text"
-                    name="nationality"
-                    value={formData.nationality}
-                    onChange={handleChange}
-                    className="p-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-green-500 focus:border-transparent"
-                    placeholder="Enter your nationality"
-                  />
-                  {errors.nationality && <span className="text-red-500 text-sm mt-1">{errors.nationality}</span>}
-                </div> */}
+                
 
                 <div className="flex flex-col">
                   <label className="text-gray-700 font-medium mb-1">
@@ -527,7 +529,7 @@ const VisaForm1 = () => {
                       {showQRCode ? "Hide QR Code" : "Continue On Mobile"}
                     </button> */}
                     <div className="">
-                    <QrGenerator visaId={visaId} page="visa-pg-1" />
+                      <QrGenerator visaId={visaId} page="visa-pg-1" />
                     </div>
                     <button
                       type="button"
@@ -542,7 +544,7 @@ const VisaForm1 = () => {
                       {isSubmitting ? "Processing..." : "Next"}
                     </button>
                   </div>
-                 
+
                   {/* {showQRCode && qrData && (
                     <div className="mt-6 p-4 bg-gray-50 rounded-lg text-center">
                       <h3 className="mb-3 text-lg font-medium text-gray-700">
@@ -569,19 +571,7 @@ const VisaForm1 = () => {
               </form>
             )}
 
-            {/* {activeTab === 1 && (
-              <div className="py-12 text-center">
-                <h3 className="text-xl font-semibold text-gray-700">Passport Details - Under Construction</h3>
-                <p className="mt-2 text-gray-600">This section is currently being developed</p>
-              </div>
-            )} */}
-
-            {/* {activeTab === 2 && (
-              <div className="py-12 text-center">
-                <h3 className="text-xl font-semibold text-gray-700">Review Section - Under Construction</h3>
-                <p className="mt-2 text-gray-600">This section is currently being developed</p>
-              </div>
-            )} */}
+            
             <Toaster position="top-right" reverseOrder={false} />
           </div>
         </div>
@@ -592,32 +582,3 @@ const VisaForm1 = () => {
 
 export default VisaForm1;
 
-
-
-
-// In your mobile page component
-// useEffect(() => {
-//   const validateToken = async () => {
-//     const params = new URLSearchParams(window.location.search);
-//     const token = params.get('token');
-    
-//     if (token) {
-//       try {
-//         const response = await axios.get(`${API_URL}/api/qr/validate/${token}`);
-        
-//         if (response.data.valid) {
-//           // Proceed with the visaId from response.data.visaId
-//           router.push(`/visa-pg-1/${response.data.visaId}`);
-//         } else {
-//           toast.error(response.data.message || "Invalid QR code");
-//           router.push('/');
-//         }
-//       } catch (error) {
-//         toast.error("Validation failed");
-//         router.push('/');
-//       }
-//     }
-//   };
-
-//   validateToken();
-// }, []);

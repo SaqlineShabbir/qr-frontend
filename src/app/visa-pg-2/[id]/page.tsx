@@ -95,11 +95,30 @@ const VisaForm2 = () => {
     setFormData({ ...formData, [name]: value });
   };
 
-  const handleReset = () => {
-    setFormData(initialFormData);
-    setErrors({});
-    localStorage.removeItem("visaFormData");
-  };
+
+
+  const handleReset = async () => {
+  
+      try {
+        setFormData(initialFormData);
+        setErrors({});
+        
+        
+  
+        const res = await fetch(`${API_URL}/api/visa/visa-form/${id}/reset-section`, {
+          method: "PATCH",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            section: "passportDetails",
+          }),
+        });
+      } catch (error) {
+        console.error("Error resetting section:", error);
+      }
+    };
+
 
   const validateForm = (): FormErrors => {
     const newErrors: FormErrors = {};

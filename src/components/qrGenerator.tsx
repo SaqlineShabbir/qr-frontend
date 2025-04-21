@@ -131,12 +131,81 @@ const QrGenerator: React.FC<QrGeneratorProps> = ({ visaId, page }) => {
     }
   };
 
+  // const generateQR = async (): Promise<void> => {
+  //   if (!canGenerate) {
+  //     toast.error("QR code for this page has already been used");
+  //     return;
+  //   }
+
+  //   setIsLoading(true);
+  //   try {
+  //     const response = await axios.post<{
+  //       qrUrl: string;
+  //       token: string;
+  //       expiresAt: string;
+  //       page: string;
+  //     }>(`${API_URL}/api/qr/generate`, { visaId, page });
+
+  //     const newQrData = {
+  //       url: response.data.qrUrl,
+  //       token: response.data.token,
+  //       status: "active" as QRStatus,
+  //       page: response.data.page,
+  //       expiresAt: response.data.expiresAt,
+  //     };
+
+  //     setQrData(newQrData);
+  //     setCanGenerate(true);
+  //     toast.success("QR code generated");
+
+  //     startStatusCheck(newQrData.token);
+  //   } catch (error: unknown) {
+  //     if (axios.isAxiosError(error)) {
+  //       if (error.response?.status === 403) {
+  //         setCanGenerate(false);
+  //         toast.error("QR code for this page has already been used");
+  //       } else {
+  //         toast.error(error.response?.data?.error || "Failed to generate QR");
+  //       }
+  //     } else {
+  //       toast.error("An unexpected error occurred");
+  //     }
+  //   } finally {
+  //     setIsLoading(false);
+  //   }
+  // };
+
+  // const getButtonText = (): string => {
+  //   if (!canGenerate) return "Already Scanned";
+  //   if (isLoading) return "Generating...";
+  //   if (!qrData) return "Get QR Code";
+  //   if (qrData.status === "active") return "Hide QR Code";
+  //   if (qrData.status === "used") return "Already Scanned";
+  //   if (qrData.status === "expired") return "QR Expired";
+  //   return "QR Closed";
+  // };
+
+  // const isButtonDisabled =
+  //   !canGenerate ||
+  //   isLoading ||
+  //   (!!qrData && ["used", "expired", "dismissed"].includes(qrData.status));
+
   const generateQR = async (): Promise<void> => {
+    // If QR is active and button says "Hide QR Code", just hide it without making a request
+    if (qrData?.status === "active" && getButtonText() === "Hide QR Code") {
+      setQrData(null);
+      if (intervalRef.current) {
+        clearInterval(intervalRef.current);
+        intervalRef.current = null;
+      }
+      return;
+    }
+  
     if (!canGenerate) {
       toast.error("QR code for this page has already been used");
       return;
     }
-
+  
     setIsLoading(true);
     try {
       const response = await axios.post<{
@@ -145,7 +214,7 @@ const QrGenerator: React.FC<QrGeneratorProps> = ({ visaId, page }) => {
         expiresAt: string;
         page: string;
       }>(`${API_URL}/api/qr/generate`, { visaId, page });
-
+  
       const newQrData = {
         url: response.data.qrUrl,
         token: response.data.token,
@@ -153,11 +222,11 @@ const QrGenerator: React.FC<QrGeneratorProps> = ({ visaId, page }) => {
         page: response.data.page,
         expiresAt: response.data.expiresAt,
       };
-
+  
       setQrData(newQrData);
       setCanGenerate(true);
       toast.success("QR code generated");
-
+  
       startStatusCheck(newQrData.token);
     } catch (error: unknown) {
       if (axios.isAxiosError(error)) {
@@ -174,19 +243,19 @@ const QrGenerator: React.FC<QrGeneratorProps> = ({ visaId, page }) => {
       setIsLoading(false);
     }
   };
-
+  
   const getButtonText = (): string => {
     if (!canGenerate) return "Already Scanned";
     if (isLoading) return "Generating...";
-    if (!qrData) return "Get QR Code";
+    if (!qrData) return "Continue On Mobile";
     if (qrData.status === "active") return "Hide QR Code";
     if (qrData.status === "used") return "Already Scanned";
     if (qrData.status === "expired") return "QR Expired";
     return "QR Closed";
   };
-
+  
   const isButtonDisabled =
-    !canGenerate ||
+    (!canGenerate && !qrData) ||
     isLoading ||
     (!!qrData && ["used", "expired", "dismissed"].includes(qrData.status));
 
